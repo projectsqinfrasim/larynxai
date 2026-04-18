@@ -1,0 +1,21 @@
+{
+  "name": "larynxai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-assisted voice training platform for voice dysphoria and post-laryngectomy rehabilitation",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r --parallel run dev",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "clean": "pnpm -r run clean"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

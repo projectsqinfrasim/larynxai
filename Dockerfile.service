@@ -1,0 +1,32 @@
+ARG SERVICE
+FROM node:20-alpine AS base
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# ── Install dependencies ────────────────────────────────────────────────────
+FROM base AS deps
+WORKDIR /app
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* ./
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/${SERVICE}/package.json ./packages/${SERVICE}/
+RUN pnpm install --frozen-lockfile --filter @larynxai/shared --filter @larynxai/${SERVICE}
+
+# ── Build ───────────────────────────────────────────────────────────────────
+FROM deps AS build
+COPY tsconfig.base.json ./
+COPY packages/shared ./packages/shared
+COPY packages/${SERVICE} ./packages/${SERVICE}
+RUN pnpm --filter @larynxai/shared build
+RUN pnpm --filter @larynxai/${SERVICE} build
+
+# ── Runtime ─────────────────────────────────────────────────────────────────
+FROM node:20-alpine AS runtime
+RUN corepack enable && corepack prepare pnpm@latest --activate
+WORKDIR /app
+COPY --from=build /app/packages/shared/dist ./packages/shared/dist
+COPY --from=build /app/packages/shared/package.json ./packages/shared/
+COPY --from=build /app/packages/${SERVICE}/dist ./packages/${SERVICE}/dist
+COPY --from=build /app/packages/${SERVICE}/package.json ./packages/${SERVICE}/
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json pnpm-workspace.yaml ./
+ENV NODE_ENV=production
+CMD ["node", "packages/${SERVICE}/dist/index.js"]
