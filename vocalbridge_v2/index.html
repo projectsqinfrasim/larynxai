@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VocalBridge</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="sim-bar">
+  <span class="sim-label">Demo controls:</span>
+  <button onclick="setSpeaking(false)" id="sim-idle" class="sim-btn active">Idle</button>
+  <button onclick="setSpeaking(true)" id="sim-speaking" class="sim-btn">Speaking</button>
+  <button onclick="restartOnboarding()" class="sim-btn">↺ Restart onboarding</button>
+</div>
+
+<div class="scene">
+<div class="pill-wrap" id="pill-wrap">
+
+  <div class="popup" id="popup-voice" style="left:0;">
+    <div class="popup-arrow" style="left:22px;"></div>
+    <div class="pop-label">Voice activity</div>
+    <div class="voice-ind">
+      <div id="pop-bars" style="display:flex;align-items:flex-end;gap:2px;height:22px;"></div>
+      <span class="speak-txt" id="pop-speak-label" style="color:#999;">Mic idle</span>
+    </div>
+  </div>
+
+  <div class="popup" id="popup-clones" style="left:120px;">
+    <div class="popup-arrow" style="left:22px;"></div>
+    <div class="pop-label">Latest clone</div>
+    <div class="wav-row">
+      <div class="wav-icon" style="background:#EAF3DE;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div style="flex:1;">
+        <div class="wav-name">pre_surgery_voice.wav</div>
+        <div class="wav-sub">2m 34s · Good clarity</div>
+      </div>
+      <span class="badge bg">Ready</span>
+    </div>
+    <div class="popup-divider"></div>
+    <div style="padding:2px 8px;">
+      <button class="btn-primary full-width">+ Add new clone</button>
+    </div>
+  </div>
+
+  <div class="popup" id="popup-chars" style="left:240px;min-width:280px;">
+    <div class="popup-arrow" style="left:22px;"></div>
+    <div class="pop-label">Voice character</div>
+    <div class="char-grid" id="char-grid"></div>
+  </div>
+
+  <div class="popup" id="popup-mute" style="left:370px;min-width:200px;">
+    <div class="popup-arrow" style="left:22px;"></div>
+    <div class="pop-label">Microphone</div>
+    <div style="padding:4px 8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px;">
+        <span class="src-name" id="mute-status-label">Mic is live</span>
+        <button id="mute-toggle-btn" onclick="toggleMute()" class="btn-primary" style="padding:6px 14px;font-size:12px;">Mute</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup" id="popup-source" style="right:0;min-width:210px;">
+    <div class="popup-arrow" style="right:32px;"></div>
+    <div class="pop-label">Call source</div>
+    <div id="src-list"></div>
+  </div>
+
+  <div class="pill" id="pill">
+
+    <!-- Step 0: name -->
+    <div class="step active" id="step-0">
+      <div class="dots" id="dots-0"></div>
+      <div class="psep"></div>
+      <span class="step-label">What's your name?</span>
+      <input class="step-input" id="name-input" placeholder="Type your name…" autocomplete="off" onkeydown="if(event.key==='Enter')advance(0)">
+      <div class="psep"></div>
+      <button class="pb primary" onclick="advance(0)">Next</button>
+      <button class="pb skip" onclick="skip(0)">Skip</button>
+    </div>
+
+    <!-- Step 1: voice check -->
+    <div class="step" id="step-1">
+      <div class="dots" id="dots-1"></div>
+      <div class="psep"></div>
+      <span class="step-label" style="font-size:12px;">Say: <em style="color:#185FA5;font-style:normal;font-weight:600;">"The quick brown fox"</em></span>
+      <div class="wave-wrap" id="wave-wrap">
+        <div class="wbar" style="height:4px;"></div>
+        <div class="wbar" style="height:4px;"></div>
+        <div class="wbar" style="height:4px;"></div>
+        <div class="wbar" style="height:4px;"></div>
+        <div class="wbar" style="height:4px;"></div>
+        <div class="wbar" style="height:4px;"></div>
+        <div class="wbar" style="height:4px;"></div>
+      </div>
+      <button class="pb primary" id="listen-btn" onclick="toggleListening()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+        Listen
+      </button>
+      <div class="psep"></div>
+      <button class="pb sounds-good" onclick="advance(1)">Sounds good →</button>
+      <button class="pb skip" onclick="skip(1)">Skip</button>
+    </div>
+
+    <!-- Step 2: upload -->
+    <div class="step" id="step-2">
+      <div class="dots" id="dots-2"></div>
+      <div class="psep"></div>
+      <span class="step-label">Upload your voice</span>
+      <span id="upload-status" class="upload-status">No file chosen</span>
+      <label class="browse-label" for="wav-input">Browse .wav</label>
+      <input type="file" id="wav-input" accept=".wav" style="display:none;" onchange="onFileChange(this)">
+      <div class="psep"></div>
+      <button class="pb primary" id="upload-next" onclick="advance(2)" style="opacity:0.35;pointer-events:none;">Next</button>
+      <button class="pb skip" onclick="skip(2)">Skip</button>
+    </div>
+
+    <!-- Step 3: done -->
+    <div class="step" id="step-3">
+      <div class="dots" id="dots-3"></div>
+      <div class="psep"></div>
+      <span class="greeting" id="greeting">You're all set!</span>
+      <div style="flex:1;"></div>
+      <button class="pb primary" onclick="enterProduct()">Enter VocalBridge →</button>
+    </div>
+
+    <!-- Step 4: main pill -->
+    <div class="step" id="step-4">
+      <button class="pb" id="btn-voice" onclick="toggleMenu('voice',event)">
+        <div id="pill-voice-icon" style="display:flex;align-items:flex-end;gap:2px;height:14px;flex-shrink:0;"></div>
+        <span id="pill-voice-label">My voice</span>
+      </button>
+      <div class="psep"></div>
+      <button class="pb" onclick="toggleMenu('clones',event)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4"/><circle cx="17" cy="17" r="4"/><path d="M14 17h6"/><path d="M17 14v6"/></svg>
+        <span>Clones</span>
+      </button>
+      <div class="psep"></div>
+      <button class="pb" onclick="toggleMenu('chars',event)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M6.17 18a6 6 0 0 1 11.66 0"/></svg>
+        <span>Characters</span>
+      </button>
+      <div class="psep"></div>
+      <button class="pb" onclick="toggleMenu('mute',event)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" id="mute-icon"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+        <span id="mute-pill-label">Mute</span>
+      </button>
+      <div class="psep"></div>
+      <button class="pb" onclick="toggleMenu('source',event)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        <span id="src-pill-label">Zoom</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
