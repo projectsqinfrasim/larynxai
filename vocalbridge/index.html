@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VocalBridge</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="sim-bar">
+  <span class="sim-label">Simulate:</span>
+  <button onclick="setSpeaking(false)" id="sim-idle" class="sim-btn active">Idle</button>
+  <button onclick="setSpeaking(true)" id="sim-speaking" class="sim-btn">Speaking</button>
+  <span class="sim-label" style="margin-left:8px;">Clone:</span>
+  <button onclick="setCS('ok')" id="cs-ok" class="sim-btn active">Good</button>
+  <button onclick="setCS('processing')" id="cs-proc" class="sim-btn">Processing</button>
+  <button onclick="setCS('error')" id="cs-err" class="sim-btn">Error</button>
+</div>
+
+<div class="scene">
+  <div class="pill-wrap" id="pill-wrap">
+
+    <div class="popup" id="popup-voice" style="left:0;">
+      <div class="popup-arrow" style="left:24px;"></div>
+      <div class="pop-label">Voice activity</div>
+      <div class="voice-indicator">
+        <div id="speak-bars" class="bars-row"></div>
+        <span id="speak-label" class="speak-label">Idle</span>
+      </div>
+    </div>
+
+    <div class="popup" id="popup-clones" style="left:130px;">
+      <div class="popup-arrow" style="left:24px;"></div>
+      <div class="pop-label">Latest clone</div>
+      <div class="wav-row" id="clone-row"></div>
+      <div class="popup-divider"></div>
+      <div style="padding:2px 8px;">
+        <button class="btn-primary full-width">+ Add new clone</button>
+      </div>
+    </div>
+
+    <div class="popup" id="popup-chars" style="left:260px;min-width:280px;">
+      <div class="popup-arrow" style="left:24px;"></div>
+      <div class="pop-label">Voice character</div>
+      <div class="char-grid" id="char-grid"></div>
+    </div>
+
+    <div class="popup" id="popup-source" style="right:0;min-width:210px;">
+      <div class="popup-arrow" style="right:40px;"></div>
+      <div class="pop-label">Call source</div>
+      <div id="src-list"></div>
+    </div>
+
+    <div class="pill" id="pill"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
